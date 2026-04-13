@@ -1,3 +1,19 @@
+# Workspace — Shop App (अपना Bazaar)
+
+## Shop App
+A Hindi/English bilingual neighborhood super-app for Indian users. React + Vite, frontend-only (no backend).
+
+**Features:**
+- 6 tabs: Home, Barber, Sabji-Fal, Grocery, Booking, Other Services
+- Cart system with add/remove/quantity/order
+- Service booking form with date/time slot selection
+- Toast notifications
+- Bottom navigation
+
+**Artifact:** `artifacts/shop-app` (preview path: `/`)
+
+---
+
 # Workspace
 
 ## Overview
