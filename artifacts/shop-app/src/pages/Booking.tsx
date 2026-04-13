@@ -4,17 +4,12 @@ import { useSearch } from "wouter";
 import { useBooking } from "@/context/BookingContext";
 import { useToast } from "@/hooks/use-toast";
 import { barberServices, otherServices } from "@/data/mock";
+import { useApp } from "@/context/AppContext";
+import { T } from "@/data/i18n";
 
 const allServiceNames = [
   ...barberServices.map((s) => s.name),
   ...otherServices.map((s) => s.name),
-];
-
-const timeSlots = [
-  "Morning 9-11 AM",
-  "Afternoon 12-2 PM",
-  "Evening 4-6 PM",
-  "Night 7-9 PM",
 ];
 
 export default function Booking() {
@@ -24,6 +19,10 @@ export default function Booking() {
 
   const { bookings, addBooking } = useBooking();
   const { toast } = useToast();
+  const { lang } = useApp();
+  const t = T[lang];
+
+  const timeSlots = [t.morning, t.afternoon, t.evening, t.night];
 
   const [form, setForm] = useState({
     name: "",
@@ -61,58 +60,57 @@ export default function Booking() {
 
   return (
     <div className="pb-2">
-      <div className="bg-gradient-to-br from-purple-500 to-violet-400 text-white px-5 pt-12 pb-8 rounded-b-[2.5rem]">
+      <div className="bg-gradient-to-br from-purple-500 to-violet-400 text-white px-5 pt-10 pb-8 rounded-b-[2.5rem]">
         <div className="flex items-center gap-3 mb-1">
           <div className="p-2 bg-white/20 rounded-xl">
             <CalendarCheck size={22} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Booking</h1>
-            <p className="text-sm opacity-80">Service बुक करें</p>
+            <h1 className="text-2xl font-bold">{t.booking}</h1>
+            <p className="text-sm opacity-80">{t.confirmBooking}</p>
           </div>
         </div>
       </div>
 
-      <div className="px-4 mt-6 space-y-5">
+      <div className="px-4 mt-5 space-y-5">
         {/* Booking Form */}
         <div className="bg-card rounded-3xl border border-card-border shadow-sm p-5">
-          <h2 className="text-base font-bold mb-4">नई Booking</h2>
+          <h2 className="text-base font-bold mb-4">{t.confirmBooking}</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Name */}
             <div>
-              <label className="text-xs font-semibold text-muted-foreground mb-1.5 block flex items-center gap-1">
+              <label className="text-xs font-semibold text-muted-foreground mb-1.5 flex items-center gap-1">
                 <User size={12} />
-                आपका नाम *
+                {t.yourName} *
               </label>
               <input
                 data-testid="booking-name"
                 type="text"
-                placeholder="Full Name"
+                placeholder={t.yourName}
                 value={form.name}
                 onChange={(e) => handleChange("name", e.target.value)}
                 className="w-full px-4 py-2.5 rounded-xl border border-input bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
               />
             </div>
 
-            {/* Phone */}
             <div>
-              <label className="text-xs font-semibold text-muted-foreground mb-1.5 block flex items-center gap-1">
+              <label className="text-xs font-semibold text-muted-foreground mb-1.5 flex items-center gap-1">
                 <Phone size={12} />
-                Phone Number *
+                {t.phoneNumber} *
               </label>
               <input
                 data-testid="booking-phone"
                 type="tel"
-                placeholder="10-digit mobile number"
+                placeholder="10-digit number"
                 value={form.phone}
                 onChange={(e) => handleChange("phone", e.target.value.replace(/\D/g, "").slice(0, 10))}
                 className="w-full px-4 py-2.5 rounded-xl border border-input bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
               />
             </div>
 
-            {/* Service */}
             <div>
-              <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Service *</label>
+              <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">
+                {t.selectService} *
+              </label>
               <div className="relative">
                 <select
                   data-testid="booking-service"
@@ -120,7 +118,7 @@ export default function Booking() {
                   onChange={(e) => handleChange("service", e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-input bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 appearance-none transition-all"
                 >
-                  <option value="">Select Service</option>
+                  <option value="">{t.selectService}</option>
                   {allServiceNames.map((name) => (
                     <option key={name} value={name}>{name}</option>
                   ))}
@@ -129,11 +127,10 @@ export default function Booking() {
               </div>
             </div>
 
-            {/* Date */}
             <div>
-              <label className="text-xs font-semibold text-muted-foreground mb-1.5 block flex items-center gap-1">
+              <label className="text-xs font-semibold text-muted-foreground mb-1.5 flex items-center gap-1">
                 <CalendarCheck size={12} />
-                Date *
+                {t.date} *
               </label>
               <input
                 data-testid="booking-date"
@@ -145,11 +142,10 @@ export default function Booking() {
               />
             </div>
 
-            {/* Time Slot */}
             <div>
-              <label className="text-xs font-semibold text-muted-foreground mb-1.5 block flex items-center gap-1">
+              <label className="text-xs font-semibold text-muted-foreground mb-1.5 flex items-center gap-1">
                 <Clock size={12} />
-                Time Slot *
+                {t.timeSlot} *
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {timeSlots.map((slot) => (
@@ -173,9 +169,9 @@ export default function Booking() {
             <button
               type="submit"
               data-testid="booking-submit"
-              className="w-full h-12 bg-primary text-primary-foreground rounded-2xl font-bold text-base hover:bg-primary/90 transition-all active:scale-98"
+              className="w-full h-12 bg-primary text-primary-foreground rounded-2xl font-bold text-base hover:bg-primary/90 transition-all active:scale-95"
             >
-              Booking Confirm करें
+              {t.confirmBooking}
             </button>
           </form>
         </div>
@@ -183,7 +179,7 @@ export default function Booking() {
         {/* Booking History */}
         {bookings.length > 0 && (
           <div>
-            <h2 className="text-base font-bold mb-3">पिछली Bookings ({bookings.length})</h2>
+            <h2 className="text-base font-bold mb-3">{t.pastBookings} ({bookings.length})</h2>
             <div className="space-y-3">
               {bookings.map((booking) => (
                 <div

@@ -1,6 +1,8 @@
-import { Scissors, Zap, Heart, Droplet, Star, Smile, Wrench, Camera, BookOpen, Wind, UtensilsCrossed } from "lucide-react";
+import { Scissors, Zap, Heart, Droplet, Star, Smile, Wrench, Camera, BookOpen, Wind, UtensilsCrossed, Clock } from "lucide-react";
 import { Service } from "@/data/mock";
 import { useLocation } from "wouter";
+import { useApp } from "@/context/AppContext";
+import { T } from "@/data/i18n";
 
 const iconMap: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number }>> = {
   scissors: Scissors,
@@ -22,6 +24,8 @@ interface ServiceCardProps {
 
 export default function ServiceCard({ service }: ServiceCardProps) {
   const [, setLocation] = useLocation();
+  const { lang } = useApp();
+  const t = T[lang];
   const Icon = iconMap[service.icon] || Wrench;
 
   const handleBookNow = () => {
@@ -47,6 +51,10 @@ export default function ServiceCard({ service }: ServiceCardProps) {
             <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{service.description}</p>
           )}
         </div>
+        <span className="flex-shrink-0 text-[9px] font-bold px-2 py-0.5 rounded-lg bg-green-100 text-green-700 flex items-center gap-1">
+          <Clock size={8} />
+          {t.available247}
+        </span>
       </div>
       <div className="flex items-center justify-between">
         <span className="text-base font-bold text-primary">
@@ -57,7 +65,7 @@ export default function ServiceCard({ service }: ServiceCardProps) {
           onClick={handleBookNow}
           className="px-4 py-1.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-all active:scale-95"
         >
-          Book Now
+          {t.bookNow}
         </button>
       </div>
     </div>

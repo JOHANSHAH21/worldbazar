@@ -2,6 +2,8 @@ import { Plus, Check } from "lucide-react";
 import { useState } from "react";
 import { Product } from "@/data/mock";
 import { useCart } from "@/context/CartContext";
+import { useApp } from "@/context/AppContext";
+import { T } from "@/data/i18n";
 
 interface ProductCardProps {
   product: Product;
@@ -9,6 +11,8 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart, cart } = useCart();
+  const { lang } = useApp();
+  const t = T[lang];
   const [justAdded, setJustAdded] = useState(false);
 
   const cartItem = cart.find((i) => i.product.id === product.id);
@@ -43,12 +47,12 @@ export default function ProductCard({ product }: ProductCardProps) {
           }`}
         >
           {justAdded ? <Check size={14} /> : <Plus size={14} />}
-          {justAdded ? "Added" : "Add"}
+          {justAdded ? t.added : t.addToCart}
         </button>
       </div>
       {cartItem && (
         <div className="text-[10px] text-center text-primary font-medium">
-          {cartItem.quantity} in cart
+          {cartItem.quantity} {t.inCart}
         </div>
       )}
     </div>
