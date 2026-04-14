@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { LangCode } from "@/data/i18n";
 
-export type Role = "customer" | "seller";
+export type Role = "customer" | "seller" | "doctor" | "delivery";
 
 interface AppContextType {
   lang: LangCode;

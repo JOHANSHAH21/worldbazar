@@ -10,6 +10,7 @@ import CartDrawer from "@/components/CartDrawer";
 import LiveClock from "@/components/LiveClock";
 import LiveUsersCounter from "@/components/LiveUsersCounter";
 import ActivityTicker from "@/components/ActivityTicker";
+import SecurityBadge from "@/components/SecurityBadge";
 import Splash from "@/pages/Splash";
 import Home from "@/pages/Home";
 import Barber from "@/pages/Barber";
@@ -19,6 +20,10 @@ import Booking from "@/pages/Booking";
 import Other from "@/pages/Other";
 import WorldwideSellers from "@/pages/WorldwideSellers";
 import SellerDashboard from "@/pages/SellerDashboard";
+import Hospital from "@/pages/Hospital";
+import Delivery from "@/pages/Delivery";
+import DoctorDashboard from "@/pages/DoctorDashboard";
+import DeliveryDashboard from "@/pages/DeliveryDashboard";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -32,6 +37,9 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-background max-w-lg mx-auto relative flex flex-col">
+      {/* Security Badge */}
+      <SecurityBadge />
+
       {/* Live header bar */}
       <div className="bg-gradient-to-r from-primary to-orange-400 px-4 py-2 flex items-center justify-between flex-shrink-0">
         <LiveClock />
@@ -43,7 +51,7 @@ function AppContent() {
 
       {/* Top bar with cart (customer only) */}
       {role === "customer" && (
-        <div className="fixed top-0 left-0 right-0 z-40 flex justify-end items-center px-4 pt-[62px] max-w-lg mx-auto pointer-events-none">
+        <div className="fixed top-0 left-0 right-0 z-40 flex justify-end items-center px-4 pt-[80px] max-w-lg mx-auto pointer-events-none">
           <div className="pointer-events-auto">
             <CartDrawer />
           </div>
@@ -61,6 +69,10 @@ function AppContent() {
           <Route path="/other" component={Other} />
           <Route path="/worldwide" component={WorldwideSellers} />
           <Route path="/seller" component={SellerDashboard} />
+          <Route path="/hospital" component={Hospital} />
+          <Route path="/delivery" component={Delivery} />
+          <Route path="/doctor-dash" component={DoctorDashboard} />
+          <Route path="/delivery-dash" component={DeliveryDashboard} />
           <Route component={NotFound} />
         </Switch>
       </div>

@@ -4,6 +4,7 @@ import { sabjiProducts, groceryProducts, barberServices, otherServices } from "@
 import { useLocation } from "wouter";
 import ProductCard from "@/components/ProductCard";
 import ServiceCard from "@/components/ServiceCard";
+import AdBanner from "@/components/AdBanner";
 import { useApp } from "@/context/AppContext";
 import { T } from "@/data/i18n";
 
@@ -54,7 +55,10 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="px-4 mt-5 space-y-6">
+      {/* Auto-Rotating Ad Banner */}
+      {!search && <AdBanner />}
+
+      <div className="px-4 mt-1 space-y-6">
         {/* Search Results */}
         {search.length > 0 && (
           <div>
@@ -85,12 +89,12 @@ export default function Home() {
         {!search && (
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: t.barber, sub: "Barber", path: "/barber", bg: "bg-orange-50 border-orange-200", icon: "✂️" },
-              { label: t.vegetables, sub: "Veggies", path: "/sabji", bg: "bg-green-50 border-green-200", icon: "🥦" },
-              { label: t.grocery, sub: "Grocery", path: "/grocery", bg: "bg-amber-50 border-amber-200", icon: "🛒" },
-              { label: t.other, sub: "Services", path: "/other", bg: "bg-blue-50 border-blue-200", icon: "🔧" },
-              { label: t.booking, sub: "Booking", path: "/booking", bg: "bg-purple-50 border-purple-200", icon: "📅" },
-              { label: t.worldwide, sub: "Global", path: "/worldwide", bg: "bg-violet-50 border-violet-200", icon: "🌍" },
+              { label: t.barber, path: "/barber", bg: "bg-orange-50 border-orange-200", icon: "✂️" },
+              { label: t.vegetables, path: "/sabji", bg: "bg-green-50 border-green-200", icon: "🥦" },
+              { label: t.grocery, path: "/grocery", bg: "bg-amber-50 border-amber-200", icon: "🛒" },
+              { label: "Hospital", path: "/hospital", bg: "bg-rose-50 border-rose-200", icon: "🏥" },
+              { label: "Delivery", path: "/delivery", bg: "bg-blue-50 border-blue-200", icon: "🛵" },
+              { label: t.worldwide, path: "/worldwide", bg: "bg-violet-50 border-violet-200", icon: "🌍" },
             ].map((cat) => (
               <button
                 key={cat.path + cat.label}
@@ -100,7 +104,6 @@ export default function Home() {
               >
                 <span className="text-2xl">{cat.icon}</span>
                 <span className="text-xs font-bold leading-tight text-center truncate w-full">{cat.label}</span>
-                <span className="text-[10px] text-muted-foreground">{cat.sub}</span>
               </button>
             ))}
           </div>

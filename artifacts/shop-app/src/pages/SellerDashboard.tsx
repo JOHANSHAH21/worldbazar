@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Store, Package, TrendingUp, Eye, Star, Plus, Globe, Check, X } from "lucide-react";
+import { Store, Package, TrendingUp, Eye, Star, Plus, Globe, X, ToggleLeft, ToggleRight, Users, Video, Phone } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { T } from "@/data/i18n";
 import { useToast } from "@/hooks/use-toast";
+import ChatCallModal from "@/components/ChatCallModal";
 
 interface SellerProduct {
   id: string;
@@ -13,12 +14,17 @@ interface SellerProduct {
   orders: number;
   rating: number;
   published: boolean;
+  inStock: boolean;
+  stock: number;
 }
 
 const INITIAL_PRODUCTS: SellerProduct[] = [
-  { id: "sp1", name: "Homemade Pickle", price: 150, unit: "jar", views: 1247, orders: 89, rating: 4.8, published: true },
-  { id: "sp2", name: "Organic Honey", price: 320, unit: "bottle", views: 892, orders: 34, rating: 4.9, published: true },
+  { id: "sp1", name: "Homemade Pickle", price: 150, unit: "jar", views: 1247, orders: 89, rating: 4.8, published: true, inStock: true, stock: 24 },
+  { id: "sp2", name: "Organic Honey", price: 320, unit: "bottle", views: 892, orders: 34, rating: 4.9, published: true, inStock: true, stock: 12 },
 ];
+
+const WORKER_STATUS = ["🟢 Free", "🟡 Busy", "🔴 Offline"] as const;
+type WorkerStatus = typeof WORKER_STATUS[number];
 
 export default function SellerDashboard() {
   const { lang } = useApp();
@@ -27,13 +33,32 @@ export default function SellerDashboard() {
 
   const [products, setProducts] = useState<SellerProduct[]>(INITIAL_PRODUCTS);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: "", price: "", unit: "kg" });
+  const [shopOpen, setShopOpen] = useState(true);
+  const [workerStatus, setWorkerStatus] = useState<WorkerStatus>("🟢 Free");
+  const [form, setForm] = useState({ name: "", price: "", unit: "kg", stock: "10" });
+  const [chatOpen, setChatOpen] = useState(false);
 
   const totalOrders = products.reduce((s, p) => s + p.orders, 0);
   const totalViews = products.reduce((s, p) => s + p.views, 0);
   const avgRating = products.length
     ? (products.reduce((s, p) => s + p.rating, 0) / products.length).toFixed(1)
     : "—";
+
+  const toggleShop = () => {
+    const next = !shopOpen;
+    setShopOpen(next);
+    toast({
+      title: next ? "🟢 Shop is Now OPEN" : "🔴 Shop is Now CLOSED",
+      description: next ? "Customers can see your shop." : "Customers are notified — shop is closed.",
+    });
+  };
+
+  const cycleWorkerStatus = () => {
+    const idx = WORKER_STATUS.indexOf(workerStatus);
+    const next = WORKER_STATUS[(idx + 1) % WORKER_STATUS.length];
+    setWorkerStatus(next);
+    toast({ title: `Status: ${next}`, description: "Customers will see your updated status." });
+  };
 
   const handleAddProduct = () => {
     if (!form.name || !form.price) {
@@ -49,11 +74,13 @@ export default function SellerDashboard() {
       orders: 0,
       rating: 0,
       published: false,
+      inStock: true,
+      stock: parseInt(form.stock) || 10,
     };
     setProducts((prev) => [newProduct, ...prev]);
-    setForm({ name: "", price: "", unit: "kg" });
+    setForm({ name: "", price: "", unit: "kg", stock: "10" });
     setShowForm(false);
-    toast({ title: t.addProduct, description: `"${newProduct.name}" added successfully!` });
+    toast({ title: t.addProduct, description: `"${newProduct.name}" added!` });
   };
 
   const handlePublish = (id: string) => {
@@ -69,6 +96,12 @@ export default function SellerDashboard() {
     }
   };
 
+  const toggleStock = (id: string) => {
+    setProducts((prev) =>
+      prev.map((p) => p.id === id ? { ...p, inStock: !p.inStock } : p)
+    );
+  };
+
   return (
     <div className="pb-2">
       {/* Header */}
@@ -77,9 +110,25 @@ export default function SellerDashboard() {
           <div className="p-2 bg-white/20 rounded-xl">
             <Store size={22} />
           </div>
-          <div>
+          <div className="flex-1">
             <h1 className="text-2xl font-bold">{t.sellerDashboard}</h1>
             <p className="text-sm opacity-80">WorldBazaar Seller</p>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setChatOpen(true)}
+              className="p-2 bg-white/20 rounded-xl"
+              title="Video Call"
+            >
+              <Video size={18} />
+            </button>
+            <button
+              onClick={() => setChatOpen(true)}
+              className="p-2 bg-white/20 rounded-xl"
+              title="Phone"
+            >
+              <Phone size={18} />
+            </button>
           </div>
         </div>
 
@@ -100,6 +149,41 @@ export default function SellerDashboard() {
       </div>
 
       <div className="px-4 mt-5 space-y-4">
+        {/* Shop Open/Close Toggle + Worker Status */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            data-testid="shop-toggle"
+            onClick={toggleShop}
+            className={`flex items-center gap-2 p-3.5 rounded-2xl border-2 transition-all active:scale-95 ${
+              shopOpen ? "border-green-400 bg-green-50" : "border-red-300 bg-red-50"
+            }`}
+          >
+            {shopOpen ? (
+              <ToggleRight size={20} className="text-green-600 flex-shrink-0" />
+            ) : (
+              <ToggleLeft size={20} className="text-red-500 flex-shrink-0" />
+            )}
+            <div className="text-left">
+              <p className={`text-xs font-black ${shopOpen ? "text-green-700" : "text-red-600"}`}>
+                {shopOpen ? "🟢 OPEN" : "🔴 CLOSED"}
+              </p>
+              <p className="text-[10px] text-muted-foreground">Tap to toggle</p>
+            </div>
+          </button>
+
+          <button
+            data-testid="worker-status"
+            onClick={cycleWorkerStatus}
+            className="flex items-center gap-2 p-3.5 rounded-2xl border-2 border-border bg-card transition-all active:scale-95"
+          >
+            <Users size={20} className="text-primary flex-shrink-0" />
+            <div className="text-left">
+              <p className="text-xs font-black">{workerStatus}</p>
+              <p className="text-[10px] text-muted-foreground">Worker Status</p>
+            </div>
+          </button>
+        </div>
+
         {/* Add Product Button */}
         <button
           data-testid="add-product-button"
@@ -122,7 +206,7 @@ export default function SellerDashboard() {
                 placeholder="e.g. Organic Honey"
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                className="w-full px-4 py-2.5 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                className="w-full px-4 py-2.5 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -134,7 +218,7 @@ export default function SellerDashboard() {
                   placeholder="0"
                   value={form.price}
                   onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
-                  className="w-full px-4 py-2.5 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
               <div>
@@ -143,13 +227,23 @@ export default function SellerDashboard() {
                   data-testid="seller-product-unit"
                   value={form.unit}
                   onChange={(e) => setForm((f) => ({ ...f, unit: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm focus:outline-none"
                 >
-                  {["kg", "g", "L", "ml", "piece", "dozen", "jar", "bottle", "pack", "month", "day", "event"].map((u) => (
+                  {["kg", "g", "L", "ml", "piece", "dozen", "jar", "bottle", "pack", "month"].map((u) => (
                     <option key={u} value={u}>{u}</option>
                   ))}
                 </select>
               </div>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Stock Quantity</label>
+              <input
+                type="number"
+                placeholder="Stock (units)"
+                value={form.stock}
+                onChange={(e) => setForm((f) => ({ ...f, stock: e.target.value }))}
+                className="w-full px-4 py-2.5 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
             </div>
             <button
               data-testid="seller-submit-product"
@@ -179,11 +273,18 @@ export default function SellerDashboard() {
                     <p className="font-bold text-sm">{product.name}</p>
                     <p className="text-base font-bold text-primary">₹{product.price}/{product.unit}</p>
                   </div>
-                  <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${
-                    product.published ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"
-                  }`}>
-                    {product.published ? "LIVE" : "Draft"}
-                  </span>
+                  <div className="flex flex-col items-end gap-1">
+                    <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${
+                      product.published ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"
+                    }`}>
+                      {product.published ? "LIVE" : "Draft"}
+                    </span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg cursor-pointer ${
+                      product.inStock ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-600"
+                    }`} onClick={() => toggleStock(product.id)}>
+                      {product.inStock ? `✅ Qty: ${product.stock}` : "❌ Out"}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3">
                   <span className="flex items-center gap-1"><Eye size={11} />{product.views.toLocaleString()}</span>
@@ -212,6 +313,8 @@ export default function SellerDashboard() {
           </div>
         </div>
       </div>
+
+      <ChatCallModal open={chatOpen} personName="Support Team" personRole="WorldBazaar Support" onClose={() => setChatOpen(false)} />
     </div>
   );
 }

@@ -1,22 +1,24 @@
 import { ShoppingCart, X, Minus, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/context/CartContext";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import PaymentModal from "@/components/PaymentModal";
 
 export default function CartDrawer() {
   const [open, setOpen] = useState(false);
+  const [payOpen, setPayOpen] = useState(false);
   const { cart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice } = useCart();
   const { toast } = useToast();
 
-  const handleOrder = () => {
+  const handleCheckout = () => {
     if (cart.length === 0) return;
+    setPayOpen(true);
+  };
+
+  const handlePayComplete = () => {
     clearCart();
+    setPayOpen(false);
     setOpen(false);
-    toast({
-      title: "Order Placed!",
-      description: `आपका order ₹${totalPrice} का confirm हो गया है!`,
-    });
   };
 
   return (
@@ -36,11 +38,8 @@ export default function CartDrawer() {
       </button>
 
       {/* Overlay */}
-      {open && (
-        <div
-          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
-          onClick={() => setOpen(false)}
-        />
+      {open && !payOpen && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)} />
       )}
 
       {/* Drawer */}
@@ -63,7 +62,7 @@ export default function CartDrawer() {
           </button>
         </div>
 
-        <div className="overflow-y-auto max-h-[55vh] px-5 py-3 space-y-3">
+        <div className="overflow-y-auto max-h-[50vh] px-5 py-3 space-y-3">
           {cart.length === 0 ? (
             <div className="text-center py-10 text-muted-foreground">
               <ShoppingCart size={40} className="mx-auto mb-3 opacity-30" />
@@ -117,16 +116,23 @@ export default function CartDrawer() {
               <span className="font-semibold text-muted-foreground">Total</span>
               <span className="text-xl font-bold text-primary">₹{totalPrice}</span>
             </div>
-            <Button
+            <button
               data-testid="order-now-button"
-              onClick={handleOrder}
-              className="w-full h-12 text-base font-bold rounded-2xl"
+              onClick={handleCheckout}
+              className="w-full h-12 bg-primary text-primary-foreground rounded-2xl font-bold text-base hover:bg-primary/90 transition-all active:scale-95"
             >
-              Order Now
-            </Button>
+              Proceed to Payment 💳
+            </button>
           </div>
         )}
       </div>
+
+      <PaymentModal
+        open={payOpen}
+        totalINR={totalPrice}
+        onClose={() => setPayOpen(false)}
+        onPay={handlePayComplete}
+      />
     </>
   );
 }

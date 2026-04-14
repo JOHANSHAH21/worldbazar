@@ -6,13 +6,13 @@ import { T } from "@/data/i18n";
 export default function LiveUsersCounter() {
   const { lang } = useApp();
   const t = T[lang];
-  const [count, setCount] = useState(12347);
+  const [count, setCount] = useState(15284);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCount((c) => {
-        const delta = Math.floor(Math.random() * 21) - 10;
-        return Math.max(12000, c + delta);
+        const delta = Math.floor(Math.random() * 31) - 10;
+        return Math.max(15000, c + delta);
       });
     }, 3000);
     return () => clearInterval(interval);
