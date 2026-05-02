@@ -30,3 +30,10 @@
     "thread-stream": "3.1.0"
   }
 }
+apps/
+├── web/
+└── api/
+packages/
+├── shared/
+├── ecommerce/
+└── telemedicine/
