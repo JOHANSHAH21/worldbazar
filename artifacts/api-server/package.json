@@ -38,3 +38,9 @@ packages/
 ├── ecommerce/
 └── telemedicine/
 packages/shared/package.json → packages/shared
+packages/shared/src/types/user.ts → packages/shared/src/types/ 
+packages/ecommerce/package.json → packages/ecommerce/ 
+packages/ecommerce/src/types/product.ts → packages/ecommerce/src/types/
+packages/telemedicine/src/types/consultation.ts → packages/telemedicine/src/types/ 
+apps/web/src/components/DoctorDashboard.tsx → apps/web/src/components/ 
+apps/api/src/routes/auth.ts → apps/api/src/routes/
