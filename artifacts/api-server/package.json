@@ -37,3 +37,4 @@ packages/
 ├── shared/
 ├── ecommerce/
 └── telemedicine/
+packages/shared/package.json → packages/shared
